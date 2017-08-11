@@ -24,19 +24,17 @@ class Quest implements ContentInterface
         // Grab any extra data
         // ---------------------------------------------------------------------------
         
-        // grab the raw CSV file based on the same row as the current quest
-        // we only want 1 quest (this quest) so we do `->one()`
-        $raw = $this->getRaw('Quest', $quest->csv_row)->one();
+        // grab the raw quest data
+        $raw = $this->getRaw('Quest', $quest->csv_row);
 
-        // grab the genre based on the raw journal_genre id
-        // we only want 1 journal entry so we do `->one()`
-        $genre = $this->get('JournalGenre', $raw->journal_genre)->one();
+        // grab the combined genre data via the raw quest data journal_genre id
+        $genre = $this->get('JournalGenre', $raw->journal_genre);
 
-        // get the raw version of journal genre at the same position as we did above
-        $genreRaw = $this->getRaw('JournalGenre', $raw->journal_genre)->one();
+        // grab the raw genre data (using the same raw quest journal_genre id)
+        $genreRaw = $this->getRaw('JournalGenre', $raw->journal_genre);
 
         // grab the category based on the raw position for journal_category
-        $category = $this->get('JournalCategory', $genreRaw->journal_category)->one();
+        $category = $this->get('JournalCategory', $genreRaw->journal_category);
 
         // ---------------------------------------------------------------------------
         // Handle output

@@ -17,17 +17,13 @@ class CsvParser
     private $csv;
     
     private $filenames;
-    private $limit;
-    private $offset;
     private $columns;
     private $data;
     
     
-    function __construct($filename, $type, $limit = null, $offset = 0)
+    function __construct($filename, $type)
     {
         $this->filename = $filename;
-        $this->limit = $limit;
-        $this->offset = $offset;
     
         // get CSV and headers
         $this->filenames = $this->getFilenames();
@@ -46,16 +42,6 @@ class CsvParser
     public function all()
     {
         return $this->data;
-    }
-    
-    /**
-     * Just return the one row
-     *
-     * @return mixed
-     */
-    public function one()
-    {
-        return (Object)$this->data[0];
     }
     
     /**
@@ -89,12 +75,7 @@ class CsvParser
     private function getData()
     {
         // start past the header data + w/e offset we provide
-        $csv = $this->csv->setOffset($this->offset + 3);
-    
-        // is a limit provided
-        if ($this->limit) {
-            $csv->setLimit($this->limit);
-        }
+        $csv = $this->csv->setOffset(3);
     
         foreach($csv->fetchAll() as $row => $quest) {
             $arr = [];
