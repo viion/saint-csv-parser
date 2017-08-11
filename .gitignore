@@ -1,3 +1,6 @@
-data/**
+data/columns/*.txt
+data/combined/*.csv
+data/output/*.txt
+data/raw/*.csv
 .idea
 vendor
