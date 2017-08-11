@@ -8,7 +8,8 @@ return [
     'CSV_ENTRIES_PER_FILE' => 200,
     
     // Quest csv file
-    'DATA_QUESTS' => __DIR__ .'/data/Quest.csv',
-    'DATA_QUESTS_OFFSETS' => __DIR__ .'/data/Quest.offsets.json',
-    'DATA_QUESTS_OUTPUT' => __DIR__ .'/data/Quest.%s.txt',
+    'DATA_COMBINED' => __DIR__ .'/data/combined',
+    'DATA_OUTPUT' => __DIR__ .'/data/output',
+    'DATA_RAW' => __DIR__ .'/data/raw',
+    'DATA_OFFSETS' => __DIR__ .'/data/offsets',
 ];

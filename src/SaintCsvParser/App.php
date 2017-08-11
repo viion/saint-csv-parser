@@ -21,15 +21,15 @@ class App
         $this->arguments = $arguments;
         
         // if no action die
-        if (!$action = $this->getArgument('action')) {
-            Log::write('No action was provided.');
+        if (!$content = $this->getArgument('content')) {
+            Log::write('No content was provided.');
             return;
         }
         
-        // run action
-        switch($action) {
+        // run content
+        switch($content) {
             default:
-                Log::write('The provided action was not recognised');
+                Log::write('The provided content type was not recognised');
                 break;
             
             case 'quest':
