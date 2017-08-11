@@ -24,8 +24,7 @@ The different commands are:
 - `limit=300` Only parse the first X rows
 
 - `format=<format>` The format to output the files, this includes:
-    - wiki
-    - json
+    - wiki (default)
 
 
 ### Helpful notes

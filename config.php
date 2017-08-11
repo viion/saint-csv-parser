@@ -11,5 +11,5 @@ return [
     'DATA_COMBINED' => __DIR__ .'/data/combined',
     'DATA_OUTPUT' => __DIR__ .'/data/output',
     'DATA_RAW' => __DIR__ .'/data/raw',
-    'DATA_OFFSETS' => __DIR__ .'/data/offsets',
+    'DATA_COLUMNS' => __DIR__ .'/data/columns',
 ];
