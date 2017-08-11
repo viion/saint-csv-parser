@@ -6,4 +6,4 @@ include_once __DIR__ . '/vendor/autoload.php';
 
 define('ROOT', __DIR__);
 
-new \SaintCsvParser\App($argv);
+new \SaintCsvParser\App\App($argv);

@@ -1,8 +1,9 @@
 <?php
 
-namespace SaintCsvParser;
+namespace SaintCsvParser\Csv;
 
 use League\Csv\Reader;
+use SaintCsvParser\App\Config;
 
 /**
  * Class CsvParserTrait

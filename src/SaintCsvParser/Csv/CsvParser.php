@@ -1,6 +1,6 @@
 <?php
 
-namespace SaintCsvParser;
+namespace SaintCsvParser\Csv;
 
 use League\Csv\Reader;
 

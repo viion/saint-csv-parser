@@ -1,6 +1,10 @@
 <?php
 
-namespace SaintCsvParser;
+namespace SaintCsvParser\App;
+
+use SaintCsvParser\Content\{
+    Quest
+};
 
 /**
  * Class App

@@ -1,6 +1,6 @@
 <?php
 
-namespace SaintCsvParser;
+namespace SaintCsvParser\App;
 
 /**
  * Class Config

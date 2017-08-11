@@ -1,7 +1,10 @@
 <?php
 
-namespace SaintCsvParser;
+namespace SaintCsvParser\Content;
 
+use SaintCsvParser\{
+    App\App, App\Config, App\Log, Csv\CsvParser
+};
 
 /**
  * Class ContentTrait
