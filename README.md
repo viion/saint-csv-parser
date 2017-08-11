@@ -29,4 +29,4 @@ The different commands are:
 
 ### Helpful notes
 
-Whenever a parse is done an `<Content>.offsets.json` file is generated which provides index offset list to the various columns, useful for building mapping
+Whenever a parse is done an `columns/<Content>.columns.txt` file is generated which provides index offset list to the various columns, useful for building mapping
