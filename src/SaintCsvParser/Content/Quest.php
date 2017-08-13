@@ -36,6 +36,21 @@ class Quest implements ContentInterface
         // grab the category based on the raw position for journal_category
         $category = $this->get('JournalCategory', $genreRaw->journal_category);
 
+        // hard-coded list of Allagan Tomestones. For 'tomestone_reward' conversion
+        $tomestoneList = [
+            1 => 'Allagan Tomestone of Poetics',
+            2 => 'Allagan Tomestone of Verity',
+            3 => 'Allagan Tomestone of Creation',
+            4 => 'Allagan Tomestone of Scripture',
+            5 => 'Allagan Tomestone of Lore',
+        ];
+
+        // change tomestone name to wiki switch template depending on name
+        $tomestoneList = [
+            1 => '|ARRTomestone = ',
+            2 => '|TomestoneLow = ',
+            3 => '|TomestoneHigh = ',
+        ];
         // ---------------------------------------------------------------------------
         // Handle output
         // ---------------------------------------------------------------------------
@@ -51,7 +66,7 @@ class Quest implements ContentInterface
         |Subtype2= {subtype2}
         |Event = <!-- {eventicon} -->
         |Required Reputation = {reputationrank}
-        |Repeatable = {repeatable}
+        |Repeatable = {repeatable} - ({interval})
         |Faction = {faction}
 
         |SmallImage = {name} Image.png <!-- {smallimage} -->
@@ -73,6 +88,7 @@ class Quest implements ContentInterface
         |EXPReward =
         |GilReward = {gilreward}
         |SealsReward = {sealsreward}
+        {tomestones}
         |Relations = {relations}
         |Misc Reward = [[{instanceunlock}]] unlocked.
 
@@ -147,6 +163,7 @@ class Quest implements ContentInterface
             '{level}' => $quest->class_level_0,
             '{reputationrank}' => $quest->beast_reputation_rank,
             '{repeatable}' => $quest->is_repeatable,
+            '{interval}' => $quest->repeat_interval_type,
             '{faction}' => $quest->beast_tribe,
             '{class}' => $quest->class_job_required,
             '{instancecontent1}' => $quest->instance_content_0 ? $quest->instance_content_0 . "," : "",
@@ -157,6 +174,7 @@ class Quest implements ContentInterface
             '{prevquest3}' => $quest->previous_quest_2 ? $quest->previous_quest_2 . "," : "",
             '{gilreward}' => $quest->gil_reward,
             '{sealsreward}' => $quest->gc_seals,
+            '{tomestones}' => $quest->tomestone_count_reward ? $tomestoneList[$quest->tomestone_reward] . $quest->tomestone_count_reward : '',
             '{relations}' => $quest->reputation_reward,
             '{instanceunlock}' => $quest->instance_content_unlock,
             '{catalyst1}' => $quest->item_catalyst_0,
