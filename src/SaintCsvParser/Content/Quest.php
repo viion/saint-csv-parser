@@ -36,16 +36,8 @@ class Quest implements ContentInterface
         // grab the category based on the raw position for journal_category
         $category = $this->get('JournalCategory', $genreRaw->journal_category);
 
-        // hard-coded list of Allagan Tomestones. For 'tomestone_reward' conversion
-        $tomestoneList = [
-            1 => 'Allagan Tomestone of Poetics',
-            2 => 'Allagan Tomestone of Verity',
-            3 => 'Allagan Tomestone of Creation',
-            4 => 'Allagan Tomestone of Scripture',
-            5 => 'Allagan Tomestone of Lore',
-        ];
-
         // change tomestone name to wiki switch template depending on name
+        // converts number in tomestone_reward to name, then changes name
         $tomestoneList = [
             1 => '|ARRTomestone = ',
             2 => '|TomestoneLow = ',
