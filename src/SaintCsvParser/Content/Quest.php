@@ -43,6 +43,182 @@ class Quest implements ContentInterface
             2 => '|TomestoneLow = ',
             3 => '|TomestoneHigh = ',
         ];
+
+        // Loop through guaranteed QuestRewards and display the item
+        $questRewards = [];
+        foreach(range(0,5) as $i) {
+
+            if ($quest->{"item_count_reward_0_$i"} > 0) {
+                $string = "\n\n|QuestReward ". ($i+1) ." = ". $quest->{"item_reward_0_$i"};
+                if ($quest->{"item_count_reward_0_$i"} > 1) {
+                    $string .= "\n|QuestReward ". ($i+1) ." Count = ". $quest->{"item_count_reward_0_$i"} . "\n";
+                }
+                $questRewards[] = $string;
+            }
+        }
+        $questRewards = implode("\n", $questRewards);
+
+        // Loop through catalyst rewards and display them as QuestReward 6 - QuestReward 8
+        $catalystRewards = [];
+        foreach(range(0,2) as $i) {
+
+            if ($quest->{"item_count_catalyst_$i"} > 0) {
+                $string = "\n|QuestReward ". (6+$i) ." = ". $quest->{"item_catalyst_$i"};
+                if ($quest->{"item_count_catalyst_$i"} > 1) {
+                    $string .= "\n|QuestReward ". (6+$i) ." Count = ". $quest->{"item_count_catalyst_$i"} ."\n";
+                }
+                $catalystRewards[] = $string;
+            }
+        }
+        $catalystRewards = implode("\n", $catalystRewards);
+
+        // Loop through optional quest rewards and display them, as QuestRewardOption #
+        $questoptionRewards = [];
+        foreach(range(0,4) as $i) {
+            // if optional item count is greater than zero and is NOT HQ, then display the option and count
+            // elseif, if count is greater than zero and IS HQ, then display option, count, and HQ = x
+            if ($quest->{"item_count_reward_1_$i"} > 0 && $quest->{"item_reward_1_is_hq_$i"} == "False") {
+                $string =  "\n|QuestRewardOption ". ($i+1) ." = ". $quest->{"item_reward_1_$i"};
+                    if ($quest->{"item_count_reward_1_$i"} > 1) {
+                    $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest->{"item_count_reward_1_$i"};
+                    }
+
+                $questoptionRewards[] = $string;
+            } elseif ($quest->{"item_count_reward_1_$i"} > 0 && $quest->{"item_reward_1_is_hq_$i"} == "True") {
+                $string =  "\n|QuestRewardOption ". ($i+1) ." = ". $quest->{"item_reward_1_$i"};
+                    if ($quest->{"item_count_reward_1_$i"} > 1) {
+                    $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest->{"item_count_reward_1_$i"} ."\n";
+                    }
+                $string .= "\n|QuestRewardOption ". ($i+1) ." HQ = x";
+
+                $questoptionRewards[] = $string;
+            }
+        }
+        $questoptionRewards = implode("\n", $questoptionRewards);
+
+        // don't display QuestReward 10 if no "Emote" is rewarded
+        $guaranteedreward7 = false;
+        if ($quest->emote_reward) {
+            $string = "\n|QuestReward 10 = $quest->emote_reward";
+            $guaranteedreward7 = $string;
+        }
+
+        // don't display QuestReward 11 if no "Action" is rewarded
+        $guaranteedreward8 = false;
+        if ($quest->action_reward) {
+            $string = "\n|QuestReward 11 = $quest->action_reward";
+            $guaranteedreward8 = $string;
+        }
+
+        // don't display QuestReward 12 if no "General Action 0" is rewarded
+        $guaranteedreward9 = false;
+        if ($quest->general_action_reward_0) {
+            $string = "\n|QuestReward 12 = $quest->general_action_reward_0";
+            $guaranteedreward9 = $string;
+        }
+
+        // don't display QuestReward 13 if no "General Action 1" is rewarded
+        $guaranteedreward10 = false;
+        if ($quest->general_action_reward_1) {
+            $string = "\n|QuestReward 13 = $quest->general_action_reward_1";
+            $guaranteedreward10 = $string;
+        }
+
+        // don't display QuestReward 14 if no "Other Reward" is rewarded
+        $guaranteedreward11 = false;
+        if ($quest->other_reward) {
+            $string = "\n|QuestReward 14 = $quest->other_reward";
+            $guaranteedreward11 = $string;
+        }
+
+        // don't display the event icon if it's 000000. If it's not, then show it in html comment
+        $eventicon = false;
+        if ($quest->icon_special == "ui/icon/000000/000000.tex") {
+        } else {
+            $string = "\n|Event = <!-- $quest->icon_special -->";
+            $eventicon = $string;
+        }
+
+        // don't display Beast Tribe Faction if "None", otherwise show it
+        $faction = false;
+        if ($quest->beast_tribe) {
+            $string = "\n|Faction = ". ucwords(strtolower($quest->beast_tribe));
+            $faction = $string;
+        }
+
+        // don't display 'Beast Tribe Reputation Required' if equal to "None", otherwise show it
+        $reputation = false;
+        if ($quest->beast_reputation_rank == "None") {
+        } else {
+            $string = "\n|Required Reputation = $quest->beast_reputation_rank";
+            $reputation = $string;
+        }
+
+        // don't display Misc Reward Dungeon unlock unless one is defined
+        $instanceunlock = false;
+        if ($quest->instance_content_unlock) {
+            $string = "\nMisc Reward = [[$quest->instance_content_unlock]] unlocked.";
+            $instanceunlock = $string;
+        }
+
+        // don't display Grand Company Seal Reward if it's zero
+        $sealsreward = false;
+        if ($quest->gc_seals > 0) {
+            $string = "\n|SealsReward = $quest->gc_seals";
+            $sealsreward = $string;
+        }
+
+        // don't display Relations reward if it's zero
+        $relations = false;
+        if ($quest->reputation_reward > 0) {
+            $string = "\n|Relations = $quest->reputation_reward";
+            $relations = $string;
+        }
+
+        // don't display required class if equal to adventurer
+        $requiredclass = false;
+        if ($quest->class_job_required == "adventurer") {
+        } else {
+            $string = "\n|Required Class = ". ucwords(strtolower($quest->class_job_required));
+            $requiredclass = $string;
+        }
+
+        // blank GilReward if equal to 0
+        $gilreward = false;
+        if ($quest->gil_reward > 0) {
+            $string = "\n|GilReward = $quest->gil_reward";
+            $gilreward = $string;
+        } else {
+            $string = "\n|GilReward =";
+            $gilreward = $string;
+        }
+
+        // if section = Sidequests, then show Section, Subtype and Subtype2, otherwise show
+        // Section, Type, and Subtype (making assumption that Type is obsolete with sidequests
+        // due to Type and Subtype being identical in the dats for those)
+        $types = false;
+        if ($category->journal_section == "Sidequests") {
+            $string = "\n|Section = $category->journal_section";
+            $string .= "\n|Subtype = $quest->journal_genre";
+            $string .= "\n|Subtype2 = $quest->place_name";
+            $types = $string;
+        } else {
+            $string = "\n|Section = $category->journal_section";
+            $string .= "\n|Type = $genre->journal_category";
+            $string .= "\n|Subtype = $quest->journal_genre";
+            $types = $string;
+        }
+
+        // Show Repeatable as 'Yes' for instantly repeatable quests, or 'Daily' for dailies, or none
+        $repeatable = false;
+        if (($quest->is_repeatable == "True") and ($quest->repeat_interval_type == "1")) {
+            $string = "\n|Repeatable = Daily";
+            $repeatable = $string;
+        } elseif (($quest->is_repeatable == "True") and ($quest->repeat_interval_type == "0")) {
+            $string = "\n|Repeatable = Yes";
+            $repeatable = $string;
+        }
+
         // ---------------------------------------------------------------------------
         // Handle output
         // ---------------------------------------------------------------------------
@@ -51,78 +227,25 @@ class Quest implements ContentInterface
         $format = '
         {{ARR Infobox Quest
         |Patch = {patch}
-        |Name = {name}
-        |Section = {section}
-        |Type = {category}
-        |Subtype = {genre}
-        |Subtype2= {subtype2}
-        |Event = <!-- {eventicon} -->
-        |Required Reputation = {reputationrank}
-        |Repeatable = {repeatable} - ({interval})
-        |Faction = {faction}
+        |Name = {name}{types}{repeatable}{faction}
 
         |SmallImage = {name} Image.png <!-- {smallimage} -->
 
         |Level = {level}
-
-        |Required Class = {class}
+        {requiredclass}
         |Required Affiliation =
         |Quest Number =
 
-        |Dungeon Requirement = {instancecontent1} {instancecontent2} {instancecontent3}
-        |Required Quests = {prevquest1} {prevquest2} {prevquest3}
+        {instancecontent1}{instancecontent2}{instancecontent3}
+        {prevquest1}{prevquest2}{prevquest3}
         |Unlocks Quests =
 
         |Objectives =
 
         |Description =
 
-        |EXPReward =
-        |GilReward = {gilreward}
-        |SealsReward = {sealsreward}
-        {tomestones}
-        |Relations = {relations}
-        |Misc Reward = [[{instanceunlock}]] unlocked.
-
-        |QuestReward 1 = {guaranteeditem1}
-        |QuestReward 1 Count = {guaranteeditemcount1}
-        |QuestReward 2 = {guaranteeditem2}
-        |QuestReward 2 Count = {guaranteeditemcount2}
-        |QuestReward 3 = {guaranteeditem3}
-        |QuestReward 3 Count = {guaranteeditemcount3}
-        |QuestReward 4 = {guaranteeditem4}
-        |QuestReward 4 Count = {guaranteeditemcount4}
-        |QuestReward 5 = {guaranteeditem5}
-        |QuestReward 5 Count = {guaranteeditemcount5}
-        |QuestReward 6 = {guaranteeditem6}
-        |QuestReward 6 Count = {guaranteeditemcount6}
-        |QuestReward 7 = {catalyst1}
-        |QuestReward 7 Count = {catalystcount1}
-        |QuestReward 8 = {catalyst2}
-        |QuestReward 8 Count = {catalystcount2}
-        |QuestReward 9 = {catalyst3}
-        |QuestReward 9 Count = {catalystcount3}
-        |QuestReward 10 = {guaranteeditem7}
-        |QuestReward 11 = {guaranteeditem8}
-        |QuestReward 12 = {guaranteeditem9}
-        |QuestReward 13 = {guaranteeditem10}
-        |QuestReward 14 = {guaranteeditem11}
-
-        |QuestRewardOption 1 = {optionalitem1}
-        |QuestRewardOption 1 Count = {optionalitemcount1}
-        |QuestRewardOption 1 HQ = {optionalitemhq1}
-        |QuestRewardOption 2 = {optionalitem2}
-        |QuestRewardOption 2 Count = {optionalitemcount2}
-        |QuestRewardOption 2 HQ = {optionalitemhq2}
-        |QuestRewardOption 3 = {optionalitem3}
-        |QuestRewardOption 3 Count = {optionalitemcount3}
-        |QuestRewardOption 3 HQ = {optionalitemhq3}
-        |QuestRewardOption 4 = {optionalitem4}
-        |QuestRewardOption 4 Count = {optionalitemcount4}
-        |QuestRewardOption 4 HQ = {optionalitemhq4}
-        |QuestRewardOption 5 = {optionalitem5}
-        |QuestRewardOption 5 Count = {optionalitemcount5}
-        |QuestRewardOption 5 HQ = {optionalitemhq5}
+        |EXPReward ={gilreward}{sealsreward}
+        {tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem10}{guaranteeditem11}{questoptionrewards}
 
         |Issuing NPC = {questgiver}
         |NPC Location =
@@ -146,68 +269,39 @@ class Quest implements ContentInterface
         $data = [
             '{patch}' => $this->app->getPatch(),
             '{name}' => $quest->name,
-            '{genre}' => $quest->journal_genre,
-            '{category}' => $genre ? $genre->journal_category : '',
-            '{section}' => $category ? $category->journal_section : '',
-            '{subtype2}' => $quest->place_name,
-            '{eventicon}' => $quest->icon_special,
+//            '{genre}' => $quest->journal_genre,
+//            '{category}' => $genre ? $genre->journal_category : '',
+//            '{section}' => $category ? $category->journal_section : '',
+//            '{subtype2}' => $quest->place_name,
+            '{types}' => $types,
+            '{eventicon}' => $eventicon,
             '{smallimage}' => $quest->icon,
             '{level}' => $quest->class_level_0,
-            '{reputationrank}' => $quest->beast_reputation_rank,
-            '{repeatable}' => $quest->is_repeatable,
-            '{interval}' => $quest->repeat_interval_type,
-            '{faction}' => $quest->beast_tribe,
-            '{class}' => $quest->class_job_required,
-            '{instancecontent1}' => $quest->instance_content_0 ? $quest->instance_content_0 . "," : "",
-            '{instancecontent2}' => $quest->instance_content_1 ? $quest->instance_content_1 . "," : "",
-            '{instancecontent3}' => $quest->instance_content_2 ? $quest->instance_content_2 . "," : "",
-            '{prevquest1}' => $quest->previous_quest_0 ? $quest->previous_quest_0 . "," : "",
-            '{prevquest2}' => $quest->previous_quest_1 ? $quest->previous_quest_1 . "," : "",
-            '{prevquest3}' => $quest->previous_quest_2 ? $quest->previous_quest_2 . "," : "",
-            '{gilreward}' => $quest->gil_reward,
-            '{sealsreward}' => $quest->gc_seals,
+            '{reputationrank}' => $reputation,
+            '{repeatable}' => $repeatable,
+//            '{interval}' => $quest->repeat_interval_type,
+            '{faction}' => $faction,
+            '{requiredclass}' => $requiredclass,
+            '{instancecontent1}' => $quest->instance_content_0 ? "|Dungeon Requirement = ". $quest->instance_content_0 . "" : "",
+            '{instancecontent2}' => $quest->instance_content_1 ? ", ". $quest->instance_content_1 . "" : "",
+            '{instancecontent3}' => $quest->instance_content_2 ? ", ". $quest->instance_content_2 . "" : "",
+            '{prevquest1}' => $quest->previous_quest_0 ? "|Required Quests = ". $quest->previous_quest_0 . "" : "",
+            '{prevquest2}' => $quest->previous_quest_1 ? ", ". $quest->previous_quest_1 . "" : "",
+            '{prevquest3}' => $quest->previous_quest_2 ? ", ". $quest->previous_quest_2 . "" : "",
+            '{gilreward}' => $gilreward,
+            '{sealsreward}' => $sealsreward,
             '{tomestones}' => $quest->tomestone_count_reward ? $tomestoneList[$quest->tomestone_reward] . $quest->tomestone_count_reward : '',
-            '{relations}' => $quest->reputation_reward,
-            '{instanceunlock}' => $quest->instance_content_unlock,
-            '{catalyst1}' => $quest->item_catalyst_0,
-            '{catalystcount1}' => $quest->item_count_catalyst_0,
-            '{catalyst2}' => $quest->item_catalyst_1,
-            '{catalystcount2}' => $quest->item_count_catalyst_1,
-            '{catalyst3}' => $quest->item_catalyst_2,
-            '{catalystcount3}' => $quest->item_count_catalyst_2,
-            '{guaranteeditem1}' => $quest->item_reward_0_0,
-            '{guaranteeditemcount1}' => $quest->item_count_reward_0_0,
-            '{guaranteeditem2}' => $quest->item_reward_0_1,
-            '{guaranteeditemcount2}' => $quest->item_count_reward_0_1,
-            '{guaranteeditem3}' => $quest->item_reward_0_2,
-            '{guaranteeditemcount3}' => $quest->item_count_reward_0_2,
-            '{guaranteeditem4}' => $quest->item_reward_0_3,
-            '{guaranteeditemcount4}' => $quest->item_count_reward_0_3,
-            '{guaranteeditem5}' => $quest->item_reward_0_4,
-            '{guaranteeditemcount5}' => $quest->item_count_reward_0_4,
-            '{guaranteeditem6}' => $quest->item_reward_0_5,
-            '{guaranteeditemcount6}' => $quest->item_count_reward_0_5,
-            '{guaranteeditem7}' => $quest->emote_reward,
-            '{guaranteeditem8}' => $quest->action_reward,
-            '{guaranteeditem9}' => $quest->general_action_reward_0,
-            '{guaranteeditem10}' => $quest->general_action_reward_1,
-            '{guaranteeditem11}' => $quest->other_reward,
-            '{optionalitem1}' => $quest->item_reward_1_0,
-            '{optionalitemcount1}' => $quest ->item_count_reward_1_0,
-            '{optionalitemhq1}' => $quest ->item_reward_1_is_hq_0,
-            '{optionalitem2}' => $quest->item_reward_1_1,
-            '{optionalitemcount2}' => $quest ->item_count_reward_1_1,
-            '{optionalitemhq2}' => $quest ->item_reward_1_is_hq_1,
-            '{optionalitem3}' => $quest->item_reward_1_2,
-            '{optionalitemcount3}' => $quest ->item_count_reward_1_2,
-            '{optionalitemhq3}' => $quest ->item_reward_1_is_hq_2,
-            '{optionalitem4}' => $quest->item_reward_1_3,
-            '{optionalitemcount4}' => $quest ->item_count_reward_1_3,
-            '{optionalitemhq4}' => $quest ->item_reward_1_is_hq_3,
-            '{optionalitem5}' => $quest->item_reward_1_4,
-            '{optionalitemcount5}' => $quest ->item_count_reward_1_4,
-            '{optionalitemhq5}' => $quest ->item_reward_1_is_hq_4,
-            '{questgiver}' => $quest ->e_npc_resident_start,
+            '{relations}' => $relations,
+            '{instanceunlock}' => $instanceunlock,
+            '{questrewards}' => $questRewards,
+            '{catalystrewards}' => $catalystRewards,
+            '{guaranteeditem7}' => $guaranteedreward7,
+            '{guaranteeditem8}' => $guaranteedreward8,
+            '{guaranteeditem9}' => $guaranteedreward9,
+            '{guaranteeditem10}' => $guaranteedreward10,
+            '{guaranteeditem11}' => $guaranteedreward11,
+            '{questoptionrewards}' => $questoptionRewards,
+            '{questgiver}' => ucwords(strtolower($quest->e_npc_resident_start)),
         ];
 
         // ---------------------------------------------------------------------------
