@@ -156,7 +156,9 @@ trait ContentTrait
         // set format
         $format = str_ireplace(array_keys($data), $data, $format);
         $format = str_ireplace('    ', null, $format);
-
+        $format = preg_replace("/\n\n\n+/", "\n\n", $format);
+        $format = preg_replace("/(QuestReward.*)\n\n(?!\\|Issuing NPC)/", "$1\n", $format);
+        $format = str_replace(" ", "", $format);
         return trim($format) . "\n\n";
     }
 
