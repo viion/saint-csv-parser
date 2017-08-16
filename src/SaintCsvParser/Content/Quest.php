@@ -47,12 +47,13 @@ class Quest implements ContentInterface
         // Loop through guaranteed QuestRewards and display the item
         $questRewards = [];
         foreach(range(0,5) as $i) {
-
             if ($quest->{"item_count_reward_0_$i"} > 0) {
                 $string = "\n\n|QuestReward ". ($i+1) ." = ". $quest->{"item_reward_0_$i"};
+                
                 if ($quest->{"item_count_reward_0_$i"} > 1) {
                     $string .= "\n|QuestReward ". ($i+1) ." Count = ". $quest->{"item_count_reward_0_$i"} . "\n";
                 }
+                
                 $questRewards[] = $string;
             }
         }
@@ -61,12 +62,13 @@ class Quest implements ContentInterface
         // Loop through catalyst rewards and display them as QuestReward 6 - QuestReward 8
         $catalystRewards = [];
         foreach(range(0,2) as $i) {
-
             if ($quest->{"item_count_catalyst_$i"} > 0) {
                 $string = "\n|QuestReward ". (6+$i) ." = ". $quest->{"item_catalyst_$i"};
+                
                 if ($quest->{"item_count_catalyst_$i"} > 1) {
                     $string .= "\n|QuestReward ". (6+$i) ." Count = ". $quest->{"item_count_catalyst_$i"} ."\n";
                 }
+                
                 $catalystRewards[] = $string;
             }
         }
@@ -79,18 +81,20 @@ class Quest implements ContentInterface
             // elseif, if count is greater than zero and IS HQ, then display option, count, and HQ = x
             if ($quest->{"item_count_reward_1_$i"} > 0 && $quest->{"item_reward_1_is_hq_$i"} == "False") {
                 $string =  "\n|QuestRewardOption ". ($i+1) ." = ". $quest->{"item_reward_1_$i"};
-                    if ($quest->{"item_count_reward_1_$i"} > 1) {
+                
+                if ($quest->{"item_count_reward_1_$i"} > 1) {
                     $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest->{"item_count_reward_1_$i"};
-                    }
+                }
 
                 $questoptionRewards[] = $string;
             } elseif ($quest->{"item_count_reward_1_$i"} > 0 && $quest->{"item_reward_1_is_hq_$i"} == "True") {
                 $string =  "\n|QuestRewardOption ". ($i+1) ." = ". $quest->{"item_reward_1_$i"};
-                    if ($quest->{"item_count_reward_1_$i"} > 1) {
+                
+                if ($quest->{"item_count_reward_1_$i"} > 1) {
                     $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest->{"item_count_reward_1_$i"} ."\n";
-                    }
+                }
+                
                 $string .= "\n|QuestRewardOption ". ($i+1) ." HQ = x";
-
                 $questoptionRewards[] = $string;
             }
         }
@@ -211,10 +215,10 @@ class Quest implements ContentInterface
 
         // Show Repeatable as 'Yes' for instantly repeatable quests, or 'Daily' for dailies, or none
         $repeatable = false;
-        if (($quest->is_repeatable == "True") and ($quest->repeat_interval_type == "1")) {
+        if (($quest->is_repeatable == "True") && ($quest->repeat_interval_type == "1")) {
             $string = "\n|Repeatable = Daily";
             $repeatable = $string;
-        } elseif (($quest->is_repeatable == "True") and ($quest->repeat_interval_type == "0")) {
+        } elseif (($quest->is_repeatable == "True") && ($quest->repeat_interval_type == "0")) {
             $string = "\n|Repeatable = Yes";
             $repeatable = $string;
         }
@@ -282,12 +286,12 @@ class Quest implements ContentInterface
 //            '{interval}' => $quest->repeat_interval_type,
             '{faction}' => $faction,
             '{requiredclass}' => $requiredclass,
-            '{instancecontent1}' => $quest->instance_content_0 ? "|Dungeon Requirement = ". $quest->instance_content_0 . "" : "",
-            '{instancecontent2}' => $quest->instance_content_1 ? ", ". $quest->instance_content_1 . "" : "",
-            '{instancecontent3}' => $quest->instance_content_2 ? ", ". $quest->instance_content_2 . "" : "",
-            '{prevquest1}' => $quest->previous_quest_0 ? "|Required Quests = ". $quest->previous_quest_0 . "" : "",
-            '{prevquest2}' => $quest->previous_quest_1 ? ", ". $quest->previous_quest_1 . "" : "",
-            '{prevquest3}' => $quest->previous_quest_2 ? ", ". $quest->previous_quest_2 . "" : "",
+            '{instancecontent1}' => $quest->instance_content_0 ? "|Dungeon Requirement = ". $quest->instance_content_0 : "",
+            '{instancecontent2}' => $quest->instance_content_1 ? ", ". $quest->instance_content_1 : "",
+            '{instancecontent3}' => $quest->instance_content_2 ? ", ". $quest->instance_content_2 : "",
+            '{prevquest1}' => $quest->previous_quest_0 ? "|Required Quests = ". $quest->previous_quest_0 : "",
+            '{prevquest2}' => $quest->previous_quest_1 ? ", ". $quest->previous_quest_1 : "",
+            '{prevquest3}' => $quest->previous_quest_2 ? ", ". $quest->previous_quest_2 : "",
             '{gilreward}' => $gilreward,
             '{sealsreward}' => $sealsreward,
             '{tomestones}' => $quest->tomestone_count_reward ? $tomestoneList[$quest->tomestone_reward] . $quest->tomestone_count_reward : '',
