@@ -49,11 +49,11 @@ class Quest implements ContentInterface
         foreach(range(0,5) as $i) {
             if ($quest->{"item_count_reward_0_$i"} > 0) {
                 $string = "\n\n|QuestReward ". ($i+1) ." = ". $quest->{"item_reward_0_$i"};
-                
+
                 if ($quest->{"item_count_reward_0_$i"} > 1) {
                     $string .= "\n|QuestReward ". ($i+1) ." Count = ". $quest->{"item_count_reward_0_$i"} . "\n";
                 }
-                
+
                 $questRewards[] = $string;
             }
         }
@@ -64,11 +64,11 @@ class Quest implements ContentInterface
         foreach(range(0,2) as $i) {
             if ($quest->{"item_count_catalyst_$i"} > 0) {
                 $string = "\n|QuestReward ". (6+$i) ." = ". $quest->{"item_catalyst_$i"};
-                
+
                 if ($quest->{"item_count_catalyst_$i"} > 1) {
                     $string .= "\n|QuestReward ". (6+$i) ." Count = ". $quest->{"item_count_catalyst_$i"} ."\n";
                 }
-                
+
                 $catalystRewards[] = $string;
             }
         }
@@ -77,24 +77,20 @@ class Quest implements ContentInterface
         // Loop through optional quest rewards and display them, as QuestRewardOption #
         $questoptionRewards = [];
         foreach(range(0,4) as $i) {
-            // if optional item count is greater than zero and is NOT HQ, then display the option and count
-            // elseif, if count is greater than zero and IS HQ, then display option, count, and HQ = x
-            if ($quest->{"item_count_reward_1_$i"} > 0 && $quest->{"item_reward_1_is_hq_$i"} == "False") {
-                $string =  "\n|QuestRewardOption ". ($i+1) ." = ". $quest->{"item_reward_1_$i"};
-                
+            // if optional item count is greater than zero, show the reward. If count is greater than 1,
+            // show the count. If reward is HQ, show HQ. Otherwise do nothing.
+
+            if ($quest->{"item_count_reward_1_$i"} > 0) {
+                $string = "\n|QuestRewardOption ". ($i+1) ." = ". $quest->{"item_reward_1_$i"};
+
                 if ($quest->{"item_count_reward_1_$i"} > 1) {
                     $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest->{"item_count_reward_1_$i"};
                 }
 
-                $questoptionRewards[] = $string;
-            } elseif ($quest->{"item_count_reward_1_$i"} > 0 && $quest->{"item_reward_1_is_hq_$i"} == "True") {
-                $string =  "\n|QuestRewardOption ". ($i+1) ." = ". $quest->{"item_reward_1_$i"};
-                
-                if ($quest->{"item_count_reward_1_$i"} > 1) {
-                    $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest->{"item_count_reward_1_$i"} ."\n";
+                if ($quest->{"item_reward_1_is_hq_$i"} == "True") {
+                    $string .= "\n|QuestRewardOption ". ($i+1) ." HQ = x";
                 }
-                
-                $string .= "\n|QuestRewardOption ". ($i+1) ." HQ = x";
+
                 $questoptionRewards[] = $string;
             }
         }
@@ -141,6 +137,14 @@ class Quest implements ContentInterface
         } else {
             $string = "\n|Event = <!-- $quest->icon_special -->";
             $eventicon = $string;
+        }
+
+        // don't display the "SmallIcon" if it's 000000. If it's not, then show it in html comment
+        $smallimage = false;
+        if ($quest->icon == "ui/icon/000000/000000.tex") {
+        } else {
+            $string = "\n|SmallImage = $quest->name Image.png <!-- $quest->icon -->";
+            $smallimage = $string;
         }
 
         // don't display Beast Tribe Faction if "None", otherwise show it
@@ -231,9 +235,9 @@ class Quest implements ContentInterface
         $format = '
         {{ARR Infobox Quest
         |Patch = {patch}
-        |Name = {name}{types}{repeatable}{faction}
+        |Name = {name}{types}{repeatable}{faction}{eventicon}
 
-        |SmallImage = {name} Image.png <!-- {smallimage} -->
+        {smallimage}
 
         |Level = {level}
         {requiredclass}
@@ -279,7 +283,7 @@ class Quest implements ContentInterface
 //            '{subtype2}' => $quest->place_name,
             '{types}' => $types,
             '{eventicon}' => $eventicon,
-            '{smallimage}' => $quest->icon,
+            '{smallimage}' => $smallimage,
             '{level}' => $quest->class_level_0,
             '{reputationrank}' => $reputation,
             '{repeatable}' => $repeatable,
