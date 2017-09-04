@@ -19,10 +19,12 @@ class App
      */
     function __construct($arguments)
     {
+        $this->arguments = $arguments;
+
         Log::write('Saint CSV Parser v0.1');
         Log::write('Memory Limit: '. ini_get('memory_limit'));
-        
-        $this->arguments = $arguments;
+        Log::write('Limit: '. ($this->getArgument('limit') ?: 'None'));
+        Log::write('-----------------------------------------');
         
         // if no action die
         if (!$content = $this->getArgument('content')) {
