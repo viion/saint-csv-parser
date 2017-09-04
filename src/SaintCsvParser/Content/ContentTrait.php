@@ -74,8 +74,8 @@ trait ContentTrait
                 $entry = (Object)$entry;
 
                 // log
-                Log::write(sprintf('>> %s/%s (Chunk: %s/%s) %s',
-                    ($i + 1), count($data), $count, count($chunks), $entry->name
+                Log::write(sprintf('>> %s/%s (Chunk: %s/%s) %s %s',
+                    ($i + 1), count($data), $count, count($chunks), $entry->key, $entry->name
                 ));
 
                 // map entry to a wiki format
