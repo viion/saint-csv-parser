@@ -29,6 +29,7 @@ class Quest implements ContentInterface
 
         $objectives = [];
         $dialogue = [];
+        $journal =[];
         if ($quest->id) {
             // explode folder into 2 chunks based on the _, we want the right chunk
             // then only take the first 3 letters, that = the folder name!
@@ -70,13 +71,18 @@ class Quest implements ContentInterface
 
                     // add objective
                     if ($textgroup->type == 'todo' && strlen($text) > 1) {
-                        $objectives[] = $text;
+                        $objectives[] = '*' .$text;
                     }
 
                     // add dialogue
                     if ($textgroup->type == 'dialogue' && strlen($text) > 1) {
                         // example: NPC says: Blah blah blah
-                        $dialogue[] = $textgroup->npc .' says: '. $text;
+                        $dialogue[] = '{{Loremquote|' .$textgroup->npc .'|link=y|'. $text .'}}';
+                    }
+
+                    // add journal
+                    if ($textgroup->type == 'journal' && strlen($text) > 1) {
+                        $journal[] = '*' .$text;
                     }
 
                     // ---------------------------------------------------------------
@@ -144,7 +150,7 @@ class Quest implements ContentInterface
                     $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest->{"item_count_reward_1_$i"};
                 }
 
-                if ($quest->{"item_reward_1_is_hq_$i"} == "True") {
+                if ($quest->{"is_hq_reward_1_$i"} == "True") {
                     $string .= "\n|QuestRewardOption ". ($i+1) ." HQ = x";
                 }
 
@@ -306,6 +312,7 @@ class Quest implements ContentInterface
         |Unlocks Quests =
 
         |Objectives =
+        {objectives}
 
         |Description =
 
@@ -320,10 +327,12 @@ class Quest implements ContentInterface
         |Items Involved =
 
         |Journal =
+        {journal}
 
         |Strategy =
         |Walkthrough =
         |Dialogue =
+        {dialogue}
         |Etymology =
         |Images =
         |Notes =
@@ -367,6 +376,9 @@ class Quest implements ContentInterface
             '{guaranteeditem11}' => $guaranteedreward11,
             '{questoptionrewards}' => $questoptionRewards,
             '{questgiver}' => ucwords(strtolower($quest->e_npc_resident_start)),
+            '{journal}' => implode("\n", $journal),
+            '{objectives}' => implode("\n",  $objectives),
+            '{dialogue}' => implode("\n", $dialogue),
         ];
 
         // ---------------------------------------------------------------------------
@@ -489,9 +501,18 @@ class Quest implements ContentInterface
                 break;
 
             default:
+                $npc = ucwords(strtolower($command[3]));
                 $order = isset($command[5]) ? intval($command[5]) : intval($command[4]);
+
+                // if npc is numeric, budge over 1
+                if (is_numeric($npc)) {
+                    $npc = ucwords(strtolower($command[4]));
+                    $order = intval($command[3]);
+                }
+
+
                 $data->type = 'dialogue';
-                $data->npc = ucwords(strtolower($command[3]));
+                $data->npc = $npc;
                 $data->order = $order;
         }
 
