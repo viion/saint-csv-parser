@@ -27,6 +27,63 @@ class Quest implements ContentInterface
         // grab the raw quest data
         $raw = $this->getRaw('Quest', $quest->csv_row);
 
+        $objectives = [];
+        $dialogue = [];
+        if ($quest->id) {
+            // explode folder into 2 chunks based on the _, we want the right chunk
+            // then only take the first 3 letters, that = the folder name!
+            $folder = substr(explode('_', $quest->id)[1], 0, 3);
+
+            // build the file path
+            $file = 'quest/'. $folder .'/'. $quest->id;
+
+            // loop through quest text data
+            $filedata = $this->getAll($file);
+
+            // ensure we have data
+            if ($filedata) {
+                foreach($filedata as $i => $entry) {
+                    // grab files to a friendlier variable name
+                    $id = $entry['key'];
+                    $command = $entry[1];
+                    $text = $entry[2];
+
+                    // get the text group from the command
+                    $textgroup = $this->getTextGroup($i, $command);
+
+                    // ---------------------------------------------------------------
+                    // Handle quest text data
+                    // ---------------------------------------------------------------
+
+                    /**
+                     * Textgroup provides details on the command type, eg:
+                     * type: (npc, question, todo, scene, etc
+                     * npc: if "type == dialogue", then npc be the npc name!
+                     * order: the entry order, might not need
+                     *
+                     * Fill up arrays and then you can use something like:
+                     *
+                     *          implode("\n", $objectives)
+                     *
+                     * to throw them in your wiki format at the bottom
+                     */
+
+                    // add objective
+                    if ($textgroup->type == 'todo' && strlen($text) > 1) {
+                        $objectives[] = $text;
+                    }
+
+                    // add dialogue
+                    if ($textgroup->type == 'dialogue' && strlen($text) > 1) {
+                        // example: NPC says: Blah blah blah
+                        $dialogue[] = $textgroup->npc .' says: '. $text;
+                    }
+
+                    // ---------------------------------------------------------------
+                }
+            }
+        }
+
         // grab the combined genre data via the raw quest data journal_genre id
         $genre = $this->get('JournalGenre', $raw->journal_genre);
 
@@ -323,5 +380,121 @@ class Quest implements ContentInterface
 
         // save
         return $this->format($format, $data);
+    }
+
+    /**
+     * This is from XIVDB v3 and will be maintained there.
+     * Supports:
+     * - BattleTalk
+     * - Journal
+     * - Scene
+     * - Todo (Objectives)
+     * - Pop
+     * - Access
+     * - Instance Talk
+     * - Questions + Answers
+     * - NPC Dialogue
+     * - System
+     *
+     * @param $i
+     * @param $command
+     * @return \stdClass
+     */
+    private function getTextGroup($i, $command)
+    {
+        $data = new \stdClass();
+        $data->type = null;
+        $data->npc = null;
+        $data->order = null;
+
+        // split command
+        $command = explode('_', $command);
+
+        // special one (npc battle talk)
+        if ($command[4] == 'BATTLETALK') {
+            $data->type = 'battle_talk';
+            $data->npc = ucwords(strtolower($command[3]));
+            $data->order = isset($command[5]) ? intval($command[5]) : $i;
+            return $data;
+        }
+
+        // build data structure from command
+        switch($command[3]) {
+            case 'SEQ':
+                $data->type = 'journal';
+                $data->order = intval($command[4]);
+                break;
+
+            case 'SCENE':
+                $data->type = 'scene';
+                $data->order = intval($command[7]);
+                break;
+
+            case 'TODO':
+                $data->type = 'todo';
+                $data->order = intval($command[4]);
+                break;
+
+            case 'POP':
+                $data->type = 'pop';
+                $data->order = $i;
+                break;
+
+            case 'ACCESS':
+                $data->type = 'access';
+                $data->order = $i;
+                break;
+
+            case 'INSTANCE':
+                $data->type = 'instance_talk';
+                $data->order = $i;
+                break;
+
+            case 'SYSTEM':
+                $data->type = 'system';
+                $data->order = $i;
+                break;
+
+            case 'QIB':
+                $npc = filter_var($command[4], FILTER_SANITIZE_STRING);
+
+                // sometimes QIB can be a todo
+                if ($npc == 'TODO') {
+                    $data->type = 'todo';
+                    $data->order = $i;
+                    break;
+                }
+
+                $data->type = 'battle_talk';
+                $data->npc = ucwords(strtolower($npc));
+                $data->order = $i;
+                break;
+
+            // 20 possible questions ...
+            case 'Q1':  case 'Q2':  case 'Q3':  case 'Q4':  case 'Q5':
+            case 'Q6':  case 'Q7':  case 'Q8':  case 'Q9':  case 'Q10':
+            case 'Q11': case 'Q12': case 'Q13': case 'Q14': case 'Q15':
+            case 'Q16': case 'Q17': case 'Q18': case 'Q19': case 'Q20':
+                $data->type = 'qa_question';
+                $data->order = intval($command[4]);
+                break;
+
+            // with 20 possible answers ...
+            case 'A1':  case 'A2':  case 'A3':  case 'A4':  case 'A5':
+            case 'A6':  case 'A7':  case 'A8':  case 'A9':  case 'A10':
+            case 'A11': case 'A12': case 'A13': case 'A14': case 'A15':
+            case 'A16': case 'A17': case 'A18': case 'A19': case 'A20':
+                $data->type = 'qa_answer';
+                $data->order = intval($command[4]);
+                break;
+
+            default:
+                $order = isset($command[5]) ? intval($command[5]) : intval($command[4]);
+                $data->type = 'dialogue';
+                $data->npc = ucwords(strtolower($command[3]));
+                $data->order = $order;
+        }
+
+        return $data;
     }
 }
