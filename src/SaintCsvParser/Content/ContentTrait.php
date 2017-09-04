@@ -110,9 +110,19 @@ trait ContentTrait
      * @param $offset
      * @return mixed
      */
-    public function getRaw($content, $offset)
+    public function getRaw($content, $offset = false)
     {
         return $this->getHandler($content, $offset, 'raw');
+    }
+
+    /**
+     * @param $content
+     * @param bool $offset
+     * @return object
+     */
+    public function getAll($content, $offset = false)
+    {
+        return $this->getHandler($content, $offset, 'all');
     }
 
     /**
