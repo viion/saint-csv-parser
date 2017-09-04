@@ -1,6 +1,10 @@
-data/columns/*.txt
-data/combined/*.csv
-data/output/*.txt
-data/raw/*.csv
+data/columns/*
+!data/columns/.gitkeep
+data/combined/*
+!data/combined/.gitkeep
+data/output/*
+!data/output/.gitkeep
+data/raw/*
+!data/raw/.gitkeep
 .idea
 vendor
