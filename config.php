@@ -9,6 +9,7 @@ return [
     
     // Quest csv file
     'DATA_COMBINED' => __DIR__ .'/data/combined',
+    'DATA_ALL' => __DIR__ .'/data/combined',
     'DATA_OUTPUT' => __DIR__ .'/data/output',
     'DATA_RAW' => __DIR__ .'/data/raw',
     'DATA_COLUMNS' => __DIR__ .'/data/columns',
