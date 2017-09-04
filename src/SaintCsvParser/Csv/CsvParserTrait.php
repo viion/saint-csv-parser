@@ -3,7 +3,7 @@
 namespace SaintCsvParser\Csv;
 
 use League\Csv\Reader;
-use SaintCsvParser\App\Config;
+use SaintCsvParser\App\{Config,Log};
 
 /**
  * Class CsvParserTrait
@@ -21,6 +21,7 @@ trait CsvParserTrait
     {
         $file = new \stdClass();
         $file->csv = Config::get('DATA_COMBINED') .'/'. $this->filename . '.csv';
+        $file->all = Config::get('DATA_ALL') .'/'. $this->filename . '.csv';
         $file->raw = Config::get('DATA_RAW') .'/'. $this->filename . '.csv';
         $file->output = Config::get('DATA_OUTPUT') .'/'. $this->filename . '.%s.txt';
         $file->columns = Config::get('DATA_COLUMNS') .'/'. $this->filename . '.columns.txt';
@@ -47,6 +48,12 @@ trait CsvParserTrait
      */
     protected function saveJson($filename, $data)
     {
+        // create folders if they don't exist
+        $folder = dirname($filename);
+        if (!is_dir($folder)) {
+            mkdir($folder, 0777, true);
+        }
+
         file_put_contents($filename, json_encode($data, JSON_PRETTY_PRINT));
     }
     
