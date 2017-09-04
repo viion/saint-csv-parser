@@ -15,16 +15,21 @@ class CsvParser
     
     /** @var Reader $csv */
     private $csv;
-    
+
     private $filenames;
+    private $filename;
+    private $type;
+    private $limit;
     private $columns;
     private $data;
     
     
-    function __construct($filename, $type)
+    function __construct($filename, $type, $limit = false)
     {
         $this->filename = $filename;
-    
+        $this->type = $type;
+        $this->limit = $limit;
+
         // get CSV and headers
         $this->filenames = $this->getFilenames();
         $this->csv = $this->getCsv($this->filenames->{$type});
@@ -50,7 +55,7 @@ class CsvParser
     private function getColumns()
     {
         $headers = $this->csv->setOffset(1)->setLimit(1)->fetchAll()[0];
-    
+
         // loop through headers
         foreach($headers as $i => $column) {
             // if hash, it's the key
@@ -58,13 +63,19 @@ class CsvParser
                 $this->columns[$i] = 'key';
                 continue;
             }
-        
+
+            // if "all", append on the increment count
+            if ($this->type == 'all') {
+                $this->columns[$i] = $i . $column;
+                continue;
+            }
+
             // ensure over 1 character
             if (strlen($column) > 1) {
                 $this->columns[$i] = $this->convertColumnName($column);
             }
         }
-        
+
         unset($headers);
         $this->saveJson($this->filenames->columns, $this->columns);
     }
@@ -76,8 +87,13 @@ class CsvParser
     {
         // start past the header data + w/e offset we provide
         $csv = $this->csv->setOffset(3);
-    
-        foreach($csv->fetchAll() as $row => $quest) {
+
+        if ($this->limit) {
+            $csv->setLimit($this->limit);
+        }
+
+        // loop through CSV
+        foreach($csv->fetchAll() as $row => $data) {
             $arr = [];
     
             // add CSV row
@@ -85,7 +101,7 @@ class CsvParser
         
             // only grab data that we have headers for
             foreach($this->columns as $i => $column) {
-                $arr[$column] = $quest[$i];
+                $arr[$column] = $data[$i];
             }
         
             $this->data[] = $arr;
