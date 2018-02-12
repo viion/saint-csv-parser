@@ -102,9 +102,9 @@ class Quest implements ContentInterface
         // change tomestone name to wiki switch template depending on name
         // converts number in tomestone_reward to name, then changes name
         $tomestoneList = [
-            1 => '|ARRTomestone = ',
-            2 => '|TomestoneLow = ',
-            3 => '|TomestoneHigh = ',
+            'Allagan Tomestone of Poetics' => '|ARRTomestone = ',
+            'Allagan Tomestone of Creation' => '|TomestoneLow = ',
+            'Allagan Tomestone of Mendacity' => '|TomestoneHigh = ',
         ];
 
         // Loop through guaranteed QuestRewards and display the item
@@ -267,10 +267,16 @@ class Quest implements ContentInterface
         // if section = Sidequests, then show Section, Subtype and Subtype2, otherwise show
         // Section, Type, and Subtype (making assumption that Type is obsolete with sidequests
         // due to Type and Subtype being identical in the dats for those)
+        // Slight cheat here, forcing Type = Sidequest for Sidequests. We shouldn't do that!
         $types = false;
         if ($category->journal_section == "Sidequests") {
-            $string = "\n|Section = $category->journal_section";
-            $string .= "\n|Subtype = $quest->journal_genre";
+            $string = "\n|Type = Sidequests";
+        // Sidequests using Subtype show correct in-game Journal
+        // Otherwise they would show things like 'Dravanian Hinterlands Sidequest'
+        // instead of 'Dravanian Sidequests'. Saving in code just in case.
+        // Line below not needed anymore.
+        // $string .= "\n|Subtype = $quest->journal_genre";
+            $string .= "\n|Subtype = $genre->journal_category";
             $string .= "\n|Subtype2 = $quest->place_name";
             $types = $string;
         } else {
@@ -290,15 +296,23 @@ class Quest implements ContentInterface
             $repeatable = $string;
         }
 
+        // Grab the correct EventIconType which should then show the correct Icon for a quest
+        // (the 'Blue Icon' that appears above an NPC's head, instead of the minimap icon)
+        $EventIconType = $this->getRaw('EventIconType', $raw->event_icon_type);
+        $npcIconAvailable = $EventIconType->npc_icon_available;
+        $npcIconAvailable += $npcIconAvailable ? ( $quest->is_repeatable == "False" ? 1 : 2 ) : 0;
+
         // ---------------------------------------------------------------------------
         // Handle output
         // ---------------------------------------------------------------------------
 
         // wiki format
         $format = '
+        http://ffxiv.gamerescape.com/wiki/{name}?action=edit
         {{ARR Infobox Quest
-        |Patch = {patch}
+        |Patch = 4.1
         |Name = {name}{types}{repeatable}{faction}{eventicon}
+        |Icontype = {questicontype}.png
 
         {smallimage}
 
@@ -314,8 +328,6 @@ class Quest implements ContentInterface
         |Objectives =
         {objectives}
 
-        |Description =
-
         |EXPReward ={gilreward}{sealsreward}
         {tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem10}{guaranteeditem11}{questoptionrewards}
 
@@ -326,34 +338,39 @@ class Quest implements ContentInterface
         |Mobs Involved =
         |Items Involved =
 
+        |Description =
         |Journal =
         {journal}
 
         |Strategy =
         |Walkthrough =
         |Dialogue =
-        {dialogue}
         |Etymology =
         |Images =
         |Notes =
-        }}';
+        }}
+        http://ffxiv.gamerescape.com/wiki/Loremonger:{name}?action=edit
+        <noinclude>{{Lorempageturn|prev=|next=}}{{Loremquestheader||Mined=X|Summary=}}</noinclude>
+        {{LoremLoc|Location=}}
+        {dialogue}';
 
 
         // fields
         $data = [
-            '{patch}' => $this->app->getPatch(),
+            //'{patch}' => $this->app->getPatch(),
             '{name}' => $quest->name,
-//            '{genre}' => $quest->journal_genre,
-//            '{category}' => $genre ? $genre->journal_category : '',
-//            '{section}' => $category ? $category->journal_section : '',
-//            '{subtype2}' => $quest->place_name,
+            '{questicontype}' => $npcIconAvailable,
+            //'{genre}' => $quest->journal_genre,
+            //'{category}' => $genre ? $genre->journal_category : '',
+            //'{section}' => $category ? $category->journal_section : '',
+            //'{subtype2}' => $quest->place_name,
             '{types}' => $types,
             '{eventicon}' => $eventicon,
             '{smallimage}' => $smallimage,
-            '{level}' => $quest->class_level_0,
+            '{level}' => $quest->class_job_level_0,
             '{reputationrank}' => $reputation,
             '{repeatable}' => $repeatable,
-//            '{interval}' => $quest->repeat_interval_type,
+            //'{interval}' => $quest->repeat_interval_type,
             '{faction}' => $faction,
             '{requiredclass}' => $requiredclass,
             '{instancecontent1}' => $quest->instance_content_0 ? "|Dungeon Requirement = ". $quest->instance_content_0 : "",
